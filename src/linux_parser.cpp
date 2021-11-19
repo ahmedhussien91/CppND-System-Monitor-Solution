@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 #include "linux_parser.h"
 
@@ -95,15 +96,17 @@ float LinuxParser::MemoryUtilization() {
 long LinuxParser::UpTime() { 
   string line;
   string title; 
-  float totalTime, idleTime;
+  long totalTime, idleTime;
   
   std::ifstream fstream(kProcDirectory + kUptimeFilename);
   if(fstream.is_open()) {
     std::getline(fstream, line);
     std::istringstream linestream(line);
     linestream >> totalTime >> idleTime;
-  } 
-  return 0;
+  } else {
+    throw std::invalid_argument("file is not open ");
+  }
+  return totalTime;
 }
 
 // TODO: Read and return the number of jiffies for the system
