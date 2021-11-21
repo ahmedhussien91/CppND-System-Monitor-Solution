@@ -125,7 +125,7 @@ long LinuxParser::IdleJiffies() { return 0; }
 // TODO: Read and return CPU utilization
 vector<string> LinuxParser::CpuUtilization() { return {}; }
 
-// TODO: Read and return the total number of processes
+// TODO: Read and return the total number of processes, not needed
 int LinuxParser::TotalProcesses() { return 0; }
 
 // TODO: Read and return the number of running processes
@@ -133,7 +133,17 @@ int LinuxParser::RunningProcesses() { return 0; }
 
 // TODO: Read and return the command associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Command(int pid[[maybe_unused]]) { return string(); }
+string LinuxParser::Command(int pid) { 
+    std::ifstream ifile(kProcDirectory + std::to_string(pid) + kStatFilename);
+    string line;
+    string name, command;
+    if(ifile.is_open()) {
+      getline(ifile, line);
+      std::istringstream lineStream(line);
+      lineStream >> name >> command;
+    }
+    return command; 
+  }
 
 // TODO: Read and return the memory used by a process
 // REMOVE: [[maybe_unused]] once you define the function
@@ -145,7 +155,32 @@ string LinuxParser::Uid(int pid[[maybe_unused]]) { return string(); }
 
 // TODO: Read and return the user associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::User(int pid[[maybe_unused]]) { return string(); }
+string LinuxParser::User(int pid) {
+    std::ifstream ifile_s(kProcDirectory + std::to_string(pid) + kStatusFilename);
+    string line;
+    string name, uid_s;
+    if(ifile_s.is_open()) {
+      while (getline(ifile_s, line)) {
+        std::istringstream lineStream(line);
+        lineStream >> name >> uid_s;
+        if (name == "Uid:"){
+          break;
+        }
+      }
+    }
+    std::ifstream ifile(kPasswordPath);
+    string username,passwd, uid;
+    if(ifile.is_open()) {
+      while (getline(ifile, line)) {
+        std::replace(line.begin(), line.end(), ':', ' ');
+        std::istringstream lineStream(line);
+        lineStream >> username >> passwd >> uid;
+        if (uid == uid_s){
+          return username;
+        }
+      }
+    } 
+   return string(); }
 
 // TODO: Read and return the uptime of a process
 // REMOVE: [[maybe_unused]] once you define the function

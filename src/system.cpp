@@ -21,7 +21,7 @@ You need to properly format the uptime. Refer to the comments mentioned in forma
 Processor& System::Cpu() { return cpu_; }
 
 // TODO: Return a container composed of the system's processes
-vector<Process>& System::Processes() { return processes_; }
+vector<Process>& System::Processes() { return processes_;}
 
 // TODO: Return the system's kernel identifier (string)
 std::string System::Kernel() { 
@@ -43,10 +43,57 @@ std::string System::OperatingSystem() {
     return os_;
 }
 // TODO: Return the number of processes actively running on the system
-int System::RunningProcesses() { return 0; }
+int System::RunningProcesses() { 
+    // fix it, added for debugging
+    return processes_.size(); 
+}
+void System::add_remove_processes() {
+    bool exists = false;
+    for(auto pid : pids) {
+        for (auto process: processes_) {
+            if(process.Pid() == pid){
+                exists = true;
+            }
+        }
+        if(exists) {
+            exists = false;
+            continue;
+        } else { 
+            // add processes that exist in pid and do not exist in processes_
+            Process process;
+            process.Pid(pid);
+            processes_.push_back(process);
+        } 
+    }
+    for(auto process: processes_) {
+        for(auto pid : pids) {
+            if(process.Pid() == pid) {
+                exists = true;
+                break;
+            }
+        }
+        if (exists) {
+            exists = false;
+            continue;
+        } else { 
+            // remove processes that exist in processes_ and don't exist in pid
+            auto found_process = std::find(processes_.begin(), processes_.end(), process.Pid());
+            if (found_process != processes_.end()){
+                processes_.erase(found_process);
+            }
+        }
+
+    }
+}
 
 // TODO: Return the total number of processes on the system
-int System::TotalProcesses() { return 0; }
+// this function adds and erases processes_ vector according to their pid
+int System::TotalProcesses() {
+    pids = LinuxParser::Pids();
+    add_remove_processes();
+    
+    return pids.size();
+}
 
 // TODO: Return the number of seconds since the system started running
 long int System::UpTime() { return (long int) LinuxParser::UpTime(); }

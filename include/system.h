@@ -24,6 +24,9 @@ class System {
   std::string os_ = "";
   Processor cpu_ = {};
   std::vector<Process> processes_ = {};
+  std::vector<int> pids = {};
+
+  void add_remove_processes();
 };
 
 #endif
