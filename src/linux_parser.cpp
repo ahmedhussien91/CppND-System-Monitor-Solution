@@ -114,7 +114,7 @@ long LinuxParser::Jiffies() { return 0; }
 
 // TODO: Read and return the number of active jiffies for a PID
 // REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::ActiveJiffies(int pid[[maybe_unused]]) { return 0; }
+long LinuxParser::ActiveJiffies(int pid) { return 0; }
 
 // TODO: Read and return the number of active jiffies for the system
 long LinuxParser::ActiveJiffies() { return 0; }
@@ -151,36 +151,41 @@ string LinuxParser::Ram(int pid[[maybe_unused]]) { return string(); }
 
 // TODO: Read and return the user ID associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Uid(int pid[[maybe_unused]]) { return string(); }
+string LinuxParser::Uid(int pid) {
+  std::ifstream ifile_s(kProcDirectory + std::to_string(pid) + kStatusFilename);
+  string line;
+  string name, uid_s;
+  if(ifile_s.is_open()) {
+    while (getline(ifile_s, line)) {
+      std::istringstream lineStream(line);
+      lineStream >> name >> uid_s;
+      if (name == "Uid:"){
+        break;
+      }
+    }
+  }
+  return uid_s; 
+}
 
 // TODO: Read and return the user associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
 string LinuxParser::User(int pid) {
-    std::ifstream ifile_s(kProcDirectory + std::to_string(pid) + kStatusFilename);
-    string line;
-    string name, uid_s;
-    if(ifile_s.is_open()) {
-      while (getline(ifile_s, line)) {
-        std::istringstream lineStream(line);
-        lineStream >> name >> uid_s;
-        if (name == "Uid:"){
-          break;
-        }
+  auto uid_s = Uid(pid);
+
+  std::ifstream ifile(kPasswordPath);
+  string line, username,passwd, uid;
+  if(ifile.is_open()) {
+    while (getline(ifile, line)) {
+      std::replace(line.begin(), line.end(), ':', ' ');
+      std::istringstream lineStream(line);
+      lineStream >> username >> passwd >> uid;
+      if (uid == uid_s){
+        return username;
       }
     }
-    std::ifstream ifile(kPasswordPath);
-    string username,passwd, uid;
-    if(ifile.is_open()) {
-      while (getline(ifile, line)) {
-        std::replace(line.begin(), line.end(), ':', ' ');
-        std::istringstream lineStream(line);
-        lineStream >> username >> passwd >> uid;
-        if (uid == uid_s){
-          return username;
-        }
-      }
-    } 
-   return string(); }
+  } 
+ return string();
+ }
 
 // TODO: Read and return the uptime of a process
 // REMOVE: [[maybe_unused]] once you define the function
