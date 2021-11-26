@@ -523,9 +523,10 @@ Status information about the process.  This is used by
               (52) exit_code  %d  (since Linux 3.5)  [PT]
                      The thread's exit status in the form reported by
                      waitpid(2).
-`Ex` 
+`Ex`
 > cat /proc/1/stat
 >> 1 (systemd) S 0 1 1 0 -1 4194560 27487 156047 157 1136 40 71 224 223 20 0 1 0 10 168890368 2837 18446744073709551615 1 1 0 0 0 0 671173123 4096 1260 0 0 0 17 11 0 0 1028 0 0 0 0 0 0 0 0 0 0
+
 ## /proc/uptime
 
  This file contains two numbers (values in seconds): the uptime of the system (including time spent in suspend) and the amount of time spent in the idle process.\
@@ -661,9 +662,9 @@ This read-only file exposes a list of all currently pending (high-resolution) ti
 
 `Ex`
 > cat /proc/timer_list
-> > part of the output 
+> > part of the output
 
-``` 
+```
 cpu: 11
  clock 0:
   .base:       ffff9f118ecdf240
@@ -836,3 +837,14 @@ Clock Event Device: lapic
 
  retries:        261
 ```
+
+| function | file | comment |
+|----------|------|---------|
+|CpuUtilization|/proc/stat| file contain cpu in different states that enables the cpu calculation|
+|jiffies | /proc/timer_list/ | find 'jiffies:' give you total jiffies or (total_uptime*HZ)|
+| HZ | /boot/config-$(uname -r), /proc/version | find 'CONFIG_HZ=', 3rd element or sysconf(_SC_CLK_TCK) |
+| running processes | /proc/stat | find 'procs_running' |
+| idle and active jiffies | /proc/stat | cpu idle and active time, find cpu parameters |
+| Active jiffies & uptime for pid | /proc/uptime, /proc/[pid]/stat | find total uptime of system(first element), find 14.utime, 15.stime , 22.starttime|
+| Ram | /proc/[pid]/statm | resident is how much ram is used, we are searching for 2nd element|
+

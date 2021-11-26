@@ -30,6 +30,8 @@ class Process {
     int pid =0;
     std::string command = "";
     std::string user = "";
+    double cpu_util =0;
+    int ram =0;
 };
 
 #endif

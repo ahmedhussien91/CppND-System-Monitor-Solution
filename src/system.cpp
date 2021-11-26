@@ -3,6 +3,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <unistd.h>
 
 #include "process.h"
 #include "processor.h"
@@ -44,11 +45,11 @@ std::string System::OperatingSystem() {
 }
 // TODO: Return the number of processes actively running on the system
 int System::RunningProcesses() { 
-    // fix it, added for debugging
-    return processes_.size(); 
+    return LinuxParser::RunningProcesses(); 
 }
 void System::add_remove_processes() {
     bool exists = false;
+    static int counter =0;
     for(auto pid : pids) {
         for (auto process: processes_) {
             if(process.Pid() == pid){
@@ -82,8 +83,11 @@ void System::add_remove_processes() {
                 processes_.erase(found_process);
             }
         }
-
     }
+    if (counter %100 == 0) {
+        std::sort(processes_.begin(), processes_.end());
+    }
+    counter++;
 }
 
 // TODO: Return the total number of processes on the system
