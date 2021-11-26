@@ -51,7 +51,7 @@ enum CPUStates {
 double CpuUtilization();
 long Jiffies();
 long ActiveJiffies();
-long ActiveJiffies(int pid, int *starttime);
+long ActiveJiffies(int pid, long *starttime);
 long IdleJiffies();
 
 // Processes

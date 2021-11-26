@@ -117,11 +117,34 @@ long LinuxParser::UpTime() {
 }
 
 // TODO: Read and return the number of jiffies for the system
-long LinuxParser::Jiffies() { return total * getHz(); }
+long LinuxParser::Jiffies() { 
+  int Idle, NonIdle;
+  int user, nice, system, idle, iowait, irq, 
+  softirq, steal, guest, guest_nice;
+  int Total, PrevTotal,totald, idled;
+  double CPU_Percentage;
+  std::string  cpu;
+  std::ifstream fstream(LinuxParser::kProcDirectory + LinuxParser::kStatFilename);
+  std::string line;
+  if (fstream.is_open()) { 
+      if (getline(fstream, line)) {
+          std::istringstream string(line);
+          string >> cpu >> user >> nice >> system >> idle >> iowait >> irq >>
+          softirq >> steal >> guest >> guest_nice;
+      }
+  }
+
+  // calculate the current Idle and NonIdle cpu utilization
+  Idle = idle + iowait;
+  NonIdle = user + nice + system + irq + softirq + steal + guest + guest_nice;
+  // total cpu utilizatoin 
+  Total = Idle + NonIdle;
+  return Total;
+}
 
 // TODO: Read and return the number of active jiffies for a PID
 // REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::ActiveJiffies(int pid, int * starttime) { 
+long LinuxParser::ActiveJiffies(int pid, long * starttime) { 
   std::ifstream ifile(kProcDirectory + std::to_string(pid) + kStatFilename);
   string line;
   string value, utime, stime, starttime_s;
@@ -146,10 +169,10 @@ long LinuxParser::ActiveJiffies(int pid, int * starttime) {
 }
 
 // TODO: Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies() { return active *getHz(); }
+long LinuxParser::ActiveJiffies() { return active; }
 
 // TODO: Read and return the number of idle jiffies for the system
-long LinuxParser::IdleJiffies() { return idle * getHz(); }
+long LinuxParser::IdleJiffies() { return idle; }
 
 // TODO: Read and return CPU utilization
 double LinuxParser::CpuUtilization() { 
@@ -194,7 +217,7 @@ double LinuxParser::CpuUtilization() {
   // int seconds = UpTime() - processstarttime;
   // double cpu_usage = ((double)processruntime)/(double)seconds;
 
-  return 0;
+  // return 0;
 }
 
 // TODO: Read and return the total number of processes, not needed
@@ -305,11 +328,11 @@ string LinuxParser::User(int pid) {
 // TODO: Read and return the uptime of a process
 // REMOVE: [[maybe_unused]] once you define the function
 long LinuxParser::UpTime(int pid) {
-  int processruntime, processstarttime;
+  long processruntime, processstarttime;
   processruntime = ActiveJiffies(pid, &processstarttime);
-  int total_time = UpTime();
+  long total_time = UpTime(); // in seconds
   if(total_time - processstarttime < 0){
     //throw std::runtime_error("uptime is negative");
   }
-  return total_time- processstarttime;
+  return total_time - processstarttime/100;
 }

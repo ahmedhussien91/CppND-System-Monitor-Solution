@@ -21,19 +21,22 @@ void Process::Pid(int pid) {
 
 // TODO: Return this process's CPU utilization
 float Process::CpuUtilization() { 
-    static double total_prev = 0;
-    static double total_p_prev = 0;
-    int startTime;
-    double total_p; 
-    total_p =(double) LinuxParser::ActiveJiffies(pid, &startTime);
-    double total = LinuxParser::ActiveJiffies();
+    static long total_prev = 0;
+    static long total_p_prev = 0;
+    long startTime;
+    long total_p; 
+    total_p = LinuxParser::ActiveJiffies(pid, &startTime)/LinuxParser::getHz();
+    // long total = LinuxParser::Jiffies();
+    double total = (double) LinuxParser::UpTime();
+    // cpu_util = ((double)(total_p - total_p_prev) / (double)(total - total_prev));
 
-    cpu_util = (total_p - total_p_prev) / (total - total_prev);
-
-    total_p_prev = total_p; 
-    total = total_prev;
-
-    this->cpu_util = cpu_util;
+    // if(total_prev == 0) {
+    //     cpu_util = 0;    
+    // }
+    // total_p_prev = total_p; 
+    // total_prev = total;
+    total = total - startTime/LinuxParser::getHz();
+    cpu_util = total_p/(total);
     return  cpu_util;
 }
 
@@ -56,9 +59,9 @@ long int Process::UpTime() { return LinuxParser::UpTime(pid); }
 // REMOVE: [[maybe_unused]] once you define the function
 bool Process::operator<(Process const& a) const {         
     bool ret =false;
-    if (a.cpu_util - this->cpu_util > 0.000001) {
+    if (this->cpu_util - a.cpu_util > 0.000001) {
         ret = true;
-    } else if (a.cpu_util - this->cpu_util < 0.000001){
+    } else {
         ret = false;
     }
     return ret;

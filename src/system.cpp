@@ -84,9 +84,8 @@ void System::add_remove_processes() {
             }
         }
     }
-    if (counter %100 == 0) {
-        std::sort(processes_.begin(), processes_.end());
-    }
+    std::sort(processes_.begin(), processes_.end());
+
     counter++;
 }
 
