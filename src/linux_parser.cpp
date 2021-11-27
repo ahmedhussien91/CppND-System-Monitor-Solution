@@ -201,19 +201,13 @@ double LinuxParser::CpuUtilization() {
   // differentiate: actual value minus the previous one
   totald = Total - PrevTotal;
   idled = Idle - PrevIdle;
-  CPU_Percentage = ((double)(totald - idled)/ (double) totald);
+  CPU_Percentage = (static_cast<double>(totald - idled)/ static_cast<double>(totald));
   // for the next function call;
   PrevIdle = Idle;
   PrevNonIdle = NonIdle;
   idle = Idle;
 
   return CPU_Percentage; 
-  // int processruntime, processstarttime;
-  // processruntime = ActiveJiffies(pid, &processstarttime);
-  // int seconds = UpTime() - processstarttime;
-  // double cpu_usage = ((double)processruntime)/(double)seconds;
-
-  // return 0;
 }
 
 //  Read and return the total number of processes, not needed
@@ -273,7 +267,7 @@ string LinuxParser::Ram(int pid) {
     Ram_d = Ram_d/1000;
   }
   std::ostringstream Ram_ds;
-  Ram_ds << std::setprecision(7) << Ram_d;  
+  Ram_ds << std::setprecision(5) << Ram_d;  
 
   return Ram_ds.str(); 
 }
@@ -322,5 +316,5 @@ long LinuxParser::UpTime(int pid) {
   if(total_time - processstarttime < 0){
     //throw std::runtime_error("uptime is negative");
   }
-  return total_time - processstarttime/100;
+  return total_time - processstarttime/getHz();
 }

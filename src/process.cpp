@@ -24,7 +24,7 @@ float Process::CpuUtilization() {
     long startTime;
     long total_p; 
     total_p = LinuxParser::ActiveJiffies(pid, &startTime)/LinuxParser::getHz();
-    double total = (double) LinuxParser::UpTime();
+    double total = static_cast<double>(LinuxParser::UpTime());
 
     total = total - startTime/LinuxParser::getHz();
     cpu_util = total_p/(total);
@@ -32,7 +32,11 @@ float Process::CpuUtilization() {
 }
 
 //  Return the command that generated this process
-string Process::Command() { return command; }
+string Process::Command() { 
+    if (command.size() > 40) {
+        command = command.substr(0,37) + "...";
+    }
+    return command; }
 
 //  Return this process's memory utilization
 string Process::Ram() { 
@@ -48,11 +52,5 @@ long int Process::UpTime() { return LinuxParser::UpTime(pid); }
 
 //  Overload the "less than" comparison operator for Process objects
 bool Process::operator<(Process const& a) const {         
-    bool ret =false;
-    if (this->cpu_util - a.cpu_util > 0.000001) {
-        ret = true;
-    } else {
-        ret = false;
-    }
-    return ret;
+    return this->cpu_util - a.cpu_util > 0.000001;
 }
