@@ -18,13 +18,8 @@ const std::string kVersionFilename{"/version"};
 const std::string kOSPath{"/etc/os-release"};
 const std::string kPasswordPath{"/etc/passwd"};
 
-static int total =0;
-static int idle =0;
-static int active =0;
-
 //loacl functions
 long getHz();
-
 
 // System
 float MemoryUtilization();

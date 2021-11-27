@@ -21,20 +21,11 @@ void Process::Pid(int pid) {
 
 // TODO: Return this process's CPU utilization
 float Process::CpuUtilization() { 
-    static long total_prev = 0;
-    static long total_p_prev = 0;
     long startTime;
     long total_p; 
     total_p = LinuxParser::ActiveJiffies(pid, &startTime)/LinuxParser::getHz();
-    // long total = LinuxParser::Jiffies();
     double total = (double) LinuxParser::UpTime();
-    // cpu_util = ((double)(total_p - total_p_prev) / (double)(total - total_prev));
 
-    // if(total_prev == 0) {
-    //     cpu_util = 0;    
-    // }
-    // total_p_prev = total_p; 
-    // total_prev = total;
     total = total - startTime/LinuxParser::getHz();
     cpu_util = total_p/(total);
     return  cpu_util;

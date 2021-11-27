@@ -121,8 +121,7 @@ long LinuxParser::Jiffies() {
   int Idle, NonIdle;
   int user, nice, system, idle, iowait, irq, 
   softirq, steal, guest, guest_nice;
-  int Total, PrevTotal,totald, idled;
-  double CPU_Percentage;
+  int Total;
   std::string  cpu;
   std::ifstream fstream(LinuxParser::kProcDirectory + LinuxParser::kStatFilename);
   std::string line;
@@ -169,10 +168,10 @@ long LinuxParser::ActiveJiffies(int pid, long * starttime) {
 }
 
 // TODO: Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies() { return active; }
+long LinuxParser::ActiveJiffies() { return 0; }
 
 // TODO: Read and return the number of idle jiffies for the system
-long LinuxParser::IdleJiffies() { return idle; }
+long LinuxParser::IdleJiffies() { return 0; }
 
 // TODO: Read and return CPU utilization
 double LinuxParser::CpuUtilization() { 
@@ -200,7 +199,6 @@ double LinuxParser::CpuUtilization() {
   // total cpu utilizatoin 
   PrevTotal = PrevIdle + PrevNonIdle;
   Total = Idle + NonIdle;
-  total=Total;
   // differentiate: actual value minus the previous one
   totald = Total - PrevTotal;
   idled = Idle - PrevIdle;
@@ -209,7 +207,6 @@ double LinuxParser::CpuUtilization() {
   PrevIdle = Idle;
   PrevNonIdle = NonIdle;
   idle = Idle;
-  active = NonIdle;
 
   return CPU_Percentage; 
   // int processruntime, processstarttime;
@@ -248,16 +245,13 @@ int LinuxParser::RunningProcesses() {
 // TODO: Read and return the command associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
 string LinuxParser::Command(int pid) { 
-    std::ifstream ifile(kProcDirectory + std::to_string(pid) + kStatFilename);
-    string line;
-    string name, command;
+    std::ifstream ifile(kProcDirectory + std::to_string(pid) + kCmdlineFilename);
+    string command;
     if(ifile.is_open()) {
-      getline(ifile, line);
-      std::istringstream lineStream(line);
-      lineStream >> name >> command;
+      getline(ifile, command);
     }
     return command; 
-  }
+}
 
 // TODO: Read and return the memory used by a process
 // REMOVE: [[maybe_unused]] once you define the function
@@ -328,8 +322,8 @@ string LinuxParser::User(int pid) {
 // TODO: Read and return the uptime of a process
 // REMOVE: [[maybe_unused]] once you define the function
 long LinuxParser::UpTime(int pid) {
-  long processruntime, processstarttime;
-  processruntime = ActiveJiffies(pid, &processstarttime);
+  long processstarttime=0;
+  ActiveJiffies(pid, &processstarttime);
   long total_time = UpTime(); // in seconds
   if(total_time - processstarttime < 0){
     //throw std::runtime_error("uptime is negative");
