@@ -11,7 +11,7 @@ using std::string;
 using std::to_string;
 using std::vector;
 
-// TODO: Return this process's ID
+//  Return this process's ID
 int Process::Pid() { return pid; }
 void Process::Pid(int pid) { 
     this->pid = pid;
@@ -19,7 +19,7 @@ void Process::Pid(int pid) {
     user = LinuxParser::User(pid);
 }
 
-// TODO: Return this process's CPU utilization
+//  Return this process's CPU utilization
 float Process::CpuUtilization() { 
     long startTime;
     long total_p; 
@@ -31,23 +31,22 @@ float Process::CpuUtilization() {
     return  cpu_util;
 }
 
-// TODO: Return the command that generated this process
+//  Return the command that generated this process
 string Process::Command() { return command; }
 
-// TODO: Return this process's memory utilization
+//  Return this process's memory utilization
 string Process::Ram() { 
     ram = stoi(LinuxParser::Ram(pid));
     return  LinuxParser::Ram(pid);
 }
 
-// TODO: Return the user (name) that generated this process
+//  Return the user (name) that generated this process
 string Process::User() { return user; }
 
-// TODO: Return the age of this process (in seconds)
+//  Return the age of this process (in seconds)
 long int Process::UpTime() { return LinuxParser::UpTime(pid); }
 
-// TODO: Overload the "less than" comparison operator for Process objects
-// REMOVE: [[maybe_unused]] once you define the function
+//  Overload the "less than" comparison operator for Process objects
 bool Process::operator<(Process const& a) const {         
     bool ret =false;
     if (this->cpu_util - a.cpu_util > 0.000001) {
