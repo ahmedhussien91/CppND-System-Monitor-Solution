@@ -1,9 +1,11 @@
 #include <string>
 #include <sstream>
+#include <iomanip>
 
 #include "format.h"
 
 using std::string;
+using namespace std;
 
 // TODO: Complete this helper function
 // INPUT: Long int measuring secondsint 
@@ -18,6 +20,6 @@ string Format::ElapsedTime(long seconds) {
     seconds = seconds % 60;
 
     std::ostringstream stream;    
-    stream << hours << ":" << minutes << ":"  << seconds;
+    stream << hours << ":" << setw (2) << setfill ('0') << minutes << ":"  << setw (2) << setfill ('0') << seconds;
     return  stream.str();
 }
